@@ -15,6 +15,13 @@ app.use(cors({
   origin: true,
   credentials: true,
 }));
+
+
+import authRoutes from "./routes/auth.route.js";
+import providerRoute from "./routes/serviceProvider.route.js"
+app.use("/api/auth", authRoutes);
+app.use('/api/provider', providerRoute);
+
 app.get("/", (req, res) => {
   res.send("UnlockDiscounts API is Live");
 });
