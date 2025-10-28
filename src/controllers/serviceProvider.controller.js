@@ -103,6 +103,7 @@ export const getServices = async (req, res) => {
         businessName: provider.business_name,
         serviceName: service.serviceName,
         price: service.price,
+        serviceId:service._id
       }))
     );
 
