@@ -3,11 +3,12 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import mongoose from "mongoose";
 
+
 export const signup = async (req, res) => {
   try {
-    const { business_name, fullname, phone_number, email, password, service_category, sub_category } = req.body;
+    const { business_name, fullname, phone_number, email, password, service_category, services } = req.body;
 
-    if (!email || !password || !fullname || !business_name) {
+    if (!email || !password || !fullname || !business_name || !service_category) {
       return res.status(400).json({ message: "All required fields must be provided" });
     }
 
@@ -25,15 +26,17 @@ export const signup = async (req, res) => {
       email,
       password: hashedPassword,
       service_category,
-      sub_category
+      services 
     });
 
     await newProvider.save();
+
     res.status(201).json({ message: "Provider registered successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 
 export const login = async (req, res) => {

@@ -31,8 +31,7 @@ const serviceproviderSchema=new mongoose.Schema({
     required:true
   },
   sub_category:{
-    type:String,
-    required:true
+    type:String
   },
   services:[
     {
