@@ -20,11 +20,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    phoneNumber: {
-      type: String,
-      required: [true, "Phone number is required"],
-      match: [/^[0-9]{10}$/, "Please enter a valid 10-digit phone number"],
-    },
   },
   { timestamps: true }
 );

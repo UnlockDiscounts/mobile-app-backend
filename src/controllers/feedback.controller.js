@@ -2,24 +2,27 @@ import Feedback from "../models/feedback.model.js";
 
 export const createFeedback = async (req, res) => {
   try {
-    const { rating } = req.body;
-    const customerId = req.user?._id
-    const providerId = req.params?.providerId
-    console.log(customerId)
+    const { rating, comment } = req.body;
+    const customerId = req.user?._id;
+    const providerId = req.params?.providerId;
+
+    console.log("🟡 Customer ID:", customerId);
+    console.log("🟡 Provider ID:", providerId);
+    console.log("🟡 Rating:", rating, "Comment:", comment);
 
     if (!customerId) {
       return res.status(400).json({ message: "user is not logged in" });
     }
 
-    if(!providerId)
-    {
+    if (!providerId) {
       return res.status(400).json({ message: "providerId is required" });
     }
+
     const feedback = await Feedback.create({
       customer: customerId,
       provider: providerId,
-
       rating,
+      comment,
     });
 
     res.status(201).json({
@@ -27,8 +30,8 @@ export const createFeedback = async (req, res) => {
       message: "Feedback submitted successfully.",
       feedback,
     });
-  }
-  catch (error) {
+  } catch (error) {
+    console.error("❌ Feedback creation error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to submit feedback.",
@@ -36,7 +39,6 @@ export const createFeedback = async (req, res) => {
     });
   }
 };
-
 
 export const getAllFeedbacks = async (req, res) => {
   try {
@@ -53,7 +55,6 @@ export const getAllFeedbacks = async (req, res) => {
     });
   }
 };
-
 
 export const deleteFeedback = async (req, res) => {
   try {
@@ -79,12 +80,15 @@ export const deleteFeedback = async (req, res) => {
 export const getProviderAverageRating = async (req, res) => {
   try {
     const { providerId } = req.params;
-    const feedbacks = await Feedback.find({ user: providerId });
+    const feedbacks = await Feedback.find({ provider: providerId }); // ✅ fixed here
+
     if (feedbacks.length === 0) {
       return res.status(200).json({ averageRating: 0, count: 0 });
     }
+
     const totalRating = feedbacks.reduce((sum, fb) => sum + fb.rating, 0);
     const averageRating = totalRating / feedbacks.length;
+
     res.status(200).json({ averageRating, count: feedbacks.length });
   } catch (error) {
     res.status(500).json({

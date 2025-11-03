@@ -2,15 +2,12 @@ import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import { generateTokens } from "../utils/generateToken.js";
 
-
-
-
 export const signup = async (req, res) => {
   try {
-    const { email, password, address, phoneNumber } = req.body;
+    const { email, password, address } = req.body;
 
-    if (!email || !password || !phoneNumber) {
-      return res.status(400).json({ message: "Email, password and phone number are required" });
+    if (!email || !password ) {
+      return res.status(400).json({ message: "Both Email and password are required" });
     }
 
     const existingUser = await User.findOne({ email });
@@ -20,7 +17,6 @@ export const signup = async (req, res) => {
       email,
       password,
       address,
-      phoneNumber,
     });
 
     const { accessToken, refreshToken } = generateTokens(newUser);
@@ -30,7 +26,6 @@ export const signup = async (req, res) => {
       user: {
         id: newUser._id,
         email: newUser.email,
-        phoneNumber: newUser.phoneNumber,
       },
       accessToken,
       refreshToken,
@@ -61,7 +56,6 @@ export const login = async (req, res) => {
       user: {
         id: user._id,
         email: user.email,
-        phoneNumber: user.phoneNumber,
       },
       accessToken,
       refreshToken,
@@ -101,17 +95,6 @@ export const verifyOtp = async (req, res) => {
 
   try {
     const decoded = await admin.auth().verifyIdToken(idToken);
-    const phone = decoded.phone_number;
-
-    if (!phone) {
-      return res.status(400).json({ message: "Invalid Firebase token" });
-    }
-
-    let user = await User.findOne({ phone });
-
-    if (!user) {
-      user = await User.create({ phone });
-    }
 
     const { accessToken, refreshToken } = generateTokens(user);
 
