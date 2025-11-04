@@ -21,11 +21,12 @@ import authRoutes from "./routes/auth.route.js";
 import providerRoute from "./routes/serviceProvider.route.js";
 import feedbackRoute from "./routes/feedback.route.js"
 import emailRoutes from "./routes/email.route.js"
+import bookingRoute from "./routes/booking.route.js"
 app.use("/api/auth", authRoutes);
 app.use('/api/provider', providerRoute);
 app.use('/api/feedback', feedbackRoute);
 app.use('/api/email',emailRoutes)
-
+app.use('/api/booking',bookingRoute);
 app.get("/", (req, res) => {
   res.send("UnlockDiscounts API is Live");
 });

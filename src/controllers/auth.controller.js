@@ -7,9 +7,9 @@ import { generateTokens } from "../utils/generateToken.js";
 
 export const signup = async (req, res) => {
   try {
-    const { email, password, address, phoneNumber } = req.body;
+    const { email, password, address } = req.body;
 
-    if (!email || !password || !phoneNumber) {
+    if (!email || !password ) {
       return res.status(400).json({ message: "Email, password and phone number are required" });
     }
 
@@ -19,8 +19,7 @@ export const signup = async (req, res) => {
     const newUser = await User.create({
       email,
       password,
-      address,
-      phoneNumber,
+      address
     });
 
     const { accessToken, refreshToken } = generateTokens(newUser);
@@ -29,9 +28,7 @@ export const signup = async (req, res) => {
       message: "User registered successfully",
       user: {
         id: newUser._id,
-        email: newUser.email,
-        phoneNumber: newUser.phoneNumber,
-      },
+        email: newUser.email      },
       accessToken,
       refreshToken,
     });

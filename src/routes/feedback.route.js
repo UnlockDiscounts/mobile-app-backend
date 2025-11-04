@@ -1,9 +1,9 @@
-import express from 'express'
-import { createFeedback, deleteFeedback, getAllFeedbacks,getProviderAverageRating } from '../controllers/feedback.controller.js';
-import { verifyToken } from '../middleware/auth.middleware.js';
+import express from "express";
+import { submitFeedback, getProviderFeedback } from "../controllers/feedback.controller.js";
+
 const router = express.Router();
-router.post("/:providerId",verifyToken, createFeedback);
-router.get("/averagefeedback/:providerId", getProviderAverageRating);
-router.delete("/:id",verifyToken, deleteFeedback);
+
+router.post("/", submitFeedback);
+router.get("/:providerId", getProviderFeedback);
 
 export default router;

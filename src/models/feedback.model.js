@@ -2,26 +2,26 @@ import mongoose from "mongoose";
 
 const feedbackSchema = new mongoose.Schema(
   {
-    customer: {
+    bookingId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Booking",
       required: true,
     },
-
-    provider: {
+    providerId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "ServiceProvider",
+    },
+    userEmail: {
+      type: String,
       required: true,
     },
-
-    rating: {
+    stars: {
       type: Number,
-      required: true,
       min: 1,
       max: 5,
+      required: true,
     },
-
-    comment: {
+    review: {
       type: String,
       trim: true,
     },
@@ -29,5 +29,4 @@ const feedbackSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Feedback = mongoose.model("Feedback", feedbackSchema);
-export default Feedback;
+export default mongoose.model("Feedback", feedbackSchema);

@@ -12,7 +12,7 @@ const router = express.Router();
 router.post('/signup', signup);
 router.post('/login', login);
 router.post("/:providerId/services",verifyToken, addService);          
-router.get("/services",verifyToken,getServices);           
+router.get("/services",getServices);           
 router.put("/:providerId/services/:serviceId",verifyToken, updateService); 
 router.delete("/:providerId/services/:serviceId",verifyToken, deleteService);
 router.put("/:providerId/experience",verifyToken, updateExperience);

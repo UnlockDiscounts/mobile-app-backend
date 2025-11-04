@@ -97,7 +97,7 @@ export const addService = async (req, res) => {
 
 export const getServices = async (req, res) => {
   try {
-    const providers = await Provider.find({}, { services: 1, fullname: 1, business_name: 1, _id: 1 });
+    const providers = await Provider.find({}, { services: 1, fullname: 1, business_name: 1,service_category: 1, _id: 1 });
 
     const allServices = providers.flatMap(provider =>
       provider.services.map(service => ({
@@ -105,6 +105,7 @@ export const getServices = async (req, res) => {
         providerName: provider.fullname,
         businessName: provider.business_name,
         serviceName: service.serviceName,
+        service_category:provider.service_category,
         price: service.price,
         serviceId:service._id
       }))
