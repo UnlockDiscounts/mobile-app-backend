@@ -9,7 +9,8 @@ const feedbackSchema = new mongoose.Schema(
     },
     providerId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "ServiceProvider",
+      ref: "Provider", // should match your service provider model name
+      required: true,
     },
     userEmail: {
       type: String,
@@ -28,5 +29,7 @@ const feedbackSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+feedbackSchema.index({ providerId: 1 }); // helps when fetching feedbacks per provider
 
 export default mongoose.model("Feedback", feedbackSchema);
