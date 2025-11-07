@@ -9,7 +9,7 @@ export const submitFeedback = async (req, res) => {
   try {
     console.log(req)
     const { bookingId, userEmail, stars, review } = req.body;
-
+    console.log("Type of stars:", typeof stars);
     if (!bookingId || !providerId || !userEmail || !stars) {
       return res.status(400).json({ message: "Missing required fields" });
     }
