@@ -2,6 +2,7 @@ import Feedback from "../models/feedback.model.js";
 
 export const submitFeedback = async (req, res) => {
   try {
+    console.log(req)
     const { bookingId, userEmail, stars, review } = req.body;
 
     if (!bookingId  || !userEmail || !stars) {
