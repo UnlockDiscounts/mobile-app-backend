@@ -29,7 +29,6 @@ export const submitFeedback = async (req, res) => {
     // Create new feedback
     const feedback = await Feedback.create({
       bookingId,
-      providerId,
       userEmail,
       stars,
       review,
