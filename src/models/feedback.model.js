@@ -9,8 +9,7 @@ const feedbackSchema = new mongoose.Schema(
     },
     providerId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Provider", // should match your service provider model name
-      required: true,
+      ref: "Provider"
     },
     userEmail: {
       type: String,
