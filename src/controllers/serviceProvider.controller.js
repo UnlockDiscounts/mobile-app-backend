@@ -1,20 +1,39 @@
-import Provider from "../models/serviceProvider.model.js"
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import Provider from "../models/serviceProvider.model.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-
+import bookingModel from "../models/booking.model.js";
+import feedbackModel from "../models/feedback.model.js";
 
 export const signup = async (req, res) => {
   try {
-    const { business_name, fullname, phone_number, email, password, service_category, services } = req.body;
+    const {
+      business_name,
+      fullname,
+      phone_number,
+      email,
+      password,
+      service_category,
+      services,
+    } = req.body;
 
-    if (!email || !password || !fullname || !business_name || !service_category) {
-      return res.status(400).json({ message: "All required fields must be provided" });
+    if (
+      !email ||
+      !password ||
+      !fullname ||
+      !business_name ||
+      !service_category
+    ) {
+      return res
+        .status(400)
+        .json({ message: "All required fields must be provided" });
     }
 
     const existingProvider = await Provider.findOne({ email });
     if (existingProvider) {
-      return res.status(400).json({ message: "Provider already exists with this email" });
+      return res
+        .status(400)
+        .json({ message: "Provider already exists with this email" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -26,7 +45,7 @@ export const signup = async (req, res) => {
       email,
       password: hashedPassword,
       service_category,
-      services 
+      services,
     });
 
     await newProvider.save();
@@ -37,27 +56,29 @@ export const signup = async (req, res) => {
   }
 };
 
-
-
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     const provider = await Provider.findOne({ email });
-    console.log(provider)
+    console.log(provider);
     if (!provider) {
       return res.status(404).json({ message: "Provider not found" });
     }
 
     const isMatch = await bcrypt.compare(password, provider.password);
-    console.log(isMatch)
+    console.log(isMatch);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const token = jwt.sign({ id: provider._id, email: provider.email }, process.env.JWT_SECRET, {
-      expiresIn: '7d'
-    });
+    const token = jwt.sign(
+      { id: provider._id, email: provider.email },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
 
     res.json({
       message: "Login successful",
@@ -66,15 +87,13 @@ export const login = async (req, res) => {
         id: provider._id,
         fullname: provider.fullname,
         email: provider.email,
-        phone_number: provider.phone_number
-      }
+        phone_number: provider.phone_number,
+      },
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
-
-
 
 export const addService = async (req, res) => {
   try {
@@ -89,7 +108,12 @@ export const addService = async (req, res) => {
     provider.services.push({ serviceName, price });
     await provider.save();
 
-    res.status(201).json({ message: "Service added successfully", services: provider.services });
+    res
+      .status(201)
+      .json({
+        message: "Service added successfully",
+        services: provider.services,
+      });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -97,17 +121,26 @@ export const addService = async (req, res) => {
 
 export const getServices = async (req, res) => {
   try {
-    const providers = await Provider.find({}, { services: 1, fullname: 1, business_name: 1,service_category: 1, _id: 1 });
+    const providers = await Provider.find(
+      {},
+      {
+        services: 1,
+        fullname: 1,
+        business_name: 1,
+        service_category: 1,
+        _id: 1,
+      }
+    );
 
-    const allServices = providers.flatMap(provider =>
-      provider.services.map(service => ({
+    const allServices = providers.flatMap((provider) =>
+      provider.services.map((service) => ({
         providerId: provider._id,
         providerName: provider.fullname,
         businessName: provider.business_name,
         serviceName: service.serviceName,
-        service_category:provider.service_category,
+        service_category: provider.service_category,
         price: service.price,
-        serviceId:service._id
+        serviceId: service._id,
       }))
     );
 
@@ -140,7 +173,7 @@ export const updateService = async (req, res) => {
 
     res.status(200).json({
       message: "Service updated successfully",
-      services: provider.services
+      services: provider.services,
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -152,13 +185,19 @@ export const deleteService = async (req, res) => {
     const { providerId, serviceId } = req.params;
 
     // validate ids
-    if (!mongoose.Types.ObjectId.isValid(providerId) || !mongoose.Types.ObjectId.isValid(serviceId)) {
-      return res.status(400).json({ message: "Invalid providerId or serviceId" });
+    if (
+      !mongoose.Types.ObjectId.isValid(providerId) ||
+      !mongoose.Types.ObjectId.isValid(serviceId)
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Invalid providerId or serviceId" });
     }
 
     // Don't use .lean() here — we want a mongoose document so subdoc helpers work
     const provider = await Provider.findById(providerId);
-    if (!provider) return res.status(404).json({ message: "Provider not found" });
+    if (!provider)
+      return res.status(404).json({ message: "Provider not found" });
 
     // Try to find subdoc by id (this returns a Mongoose subdocument if provider is a doc)
     const service = provider.services.id(serviceId);
@@ -204,8 +243,105 @@ export const updateExperience = async (req, res) => {
       return res.status(404).json({ message: "Provider not found" });
     }
 
-    res.status(200).json({ message: "Experience updated successfully", experience: provider.experience });
+    res
+      .status(200)
+      .json({
+        message: "Experience updated successfully",
+        experience: provider.experience,
+      });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+
+export const getBookingsByBusinessAndProvider = async (req, res) => {
+  try {
+    const { businessName, providerName } = req.query;
+
+    if (!businessName || !providerName) {
+      return res.status(400).json({
+        success: false,
+        message: "Both businessName and providerName are required",
+      });
+    }
+
+    // Find bookings matching both fields
+    const bookings = await bookingModel.find({
+      businessName,
+      providerName,
+    }).sort({ createdAt: -1 }); // latest first
+
+    if (bookings.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No bookings found for this business and provider",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      totalBookings: bookings.length,
+      data: bookings,
+    });
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: error.message,
+    });
+  }
+};
+
+
+
+export const getFeedbackByBooking = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+
+    // Step 1: Find the feedback entry
+    const feedback = await feedbackModel.findOne({ bookingId });
+    if (!feedback) {
+      return res.status(404).json({
+        success: false,
+        message: "Feedback not found for this booking",
+      });
+    }
+
+    // Step 2: Find the corresponding booking
+    const booking = await bookingModel.findById(bookingId);
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found",
+      });
+    }
+
+    // Step 3: Combine feedback with provider and business details
+    const response = {
+      feedbackId: feedback._id,
+      bookingId: feedback.bookingId,
+      userEmail: feedback.userEmail,
+      stars: feedback.stars,
+      review: feedback.review,
+      createdAt: feedback.createdAt,
+      providerName: booking.providerName,
+      businessName: booking.businessName,
+      service: booking.service,
+      price: booking.price,
+      status: booking.status,
+    };
+
+    return res.status(200).json({
+      success: true,
+      data: response,
+    });
+  } catch (error) {
+    console.error("Error fetching feedback:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: error.message,
+    });
   }
 };

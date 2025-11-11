@@ -4,7 +4,9 @@ import { signup,login,addService,
   getServices,
   updateService,
   deleteService,
-  updateExperience } from '../controllers/serviceProvider.controller.js';
+  updateExperience, 
+  getBookingsByBusinessAndProvider,
+  getFeedbackByBooking} from '../controllers/serviceProvider.controller.js';
 import { verifyToken } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
@@ -16,5 +18,7 @@ router.get("/services",getServices);
 router.put("/:providerId/services/:serviceId",verifyToken, updateService); 
 router.delete("/:providerId/services/:serviceId",verifyToken, deleteService);
 router.put("/:providerId/experience",verifyToken, updateExperience);
+router.get("/getbookings",getBookingsByBusinessAndProvider)
+router.get("/get-feedback/:bookingId",getFeedbackByBooking)
 
 export default router;
