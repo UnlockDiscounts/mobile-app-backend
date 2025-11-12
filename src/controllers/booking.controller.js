@@ -67,3 +67,44 @@ export const getBookingsByEmail = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+
+export const getRecentBookingsByProvider = async (req, res) => {
+  try {
+    const { businessName, providerName } = req.query;
+
+    if (!businessName || !providerName) {
+      return res.status(400).json({
+        success: false,
+        message: "Both businessName and providerName are required",
+      });
+    }
+
+    // Find recent bookings for that provider
+    const recentBookings = await Booking.find({
+      businessName,
+      providerName,
+    })
+      .sort({ createdAt: -1 }) // recent first
+      .limit(5); // latest 5 bookings (you can change it)
+
+    if (recentBookings.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No bookings found for this provider",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      count: recentBookings.length,
+      data: recentBookings,
+    });
+  } catch (error) {
+    console.error("Error fetching recent bookings by provider:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching bookings",
+    });
+  }
+};
